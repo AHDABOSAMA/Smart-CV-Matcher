@@ -1,0 +1,37 @@
+services:
+  cv-matcher:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smart-cv-matcher
+    ports:
+      - "8001:8000"
+    env_file:
+      - .env
+    volumes:
+      - cv_data:/app/data/cvs
+      - chroma_data:/app/chroma_db
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    deploy:                          # ADD THIS
+      resources:                     # ADD THIS
+        reservations:                # ADD THIS
+          devices:                   # ADD THIS
+            - driver: nvidia         # ADD THIS
+              count: 1               # ADD THIS
+              capabilities: [gpu]    # ADD THIS
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  cv_data:
+  chroma_data:
+  ollama_data:
