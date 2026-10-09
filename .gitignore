@@ -1,4 +1,4 @@
-# Secrets — NEVER commit
+# Secrets - NEVER commit
 .env
 
 # Python
@@ -8,6 +8,7 @@ __pycache__/
 .venv/
 venv/
 *.egg-info/
+.pytest_cache/
 
 # Data & DB (large files, generated at runtime)
 data/cvs/
@@ -20,3 +21,7 @@ chroma_db/
 # OS
 .DS_Store
 Thumbs.db
+venv310/
+
+venv_old/
+manual_llm_check.py
