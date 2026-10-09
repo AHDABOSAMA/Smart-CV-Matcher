@@ -37,14 +37,32 @@ class Settings:
     # ── Chunking strategy ─────────────────────────────────────────────────────
     CHUNK_SIZE: int = int(os.getenv("CHUNK_SIZE", "400"))
     CHUNK_OVERLAP: int = int(os.getenv("CHUNK_OVERLAP", "50"))
-
-    # ── Retrieval ─────────────────────────────────────────────────────────────
+    
+    # ── Retrieval ──────────────────────────────────────────────────────────────
     TOP_K: int = int(os.getenv("TOP_K", "5"))
+
 
 
 @lru_cache()
 def get_settings() -> Settings:
-    return Settings()
+    config = Settings()
+
+    if config.CHUNK_SIZE <= 0:
+        raise ValueError("CHUNK_SIZE must be greater than 0.")
+
+    if (
+        config.CHUNK_OVERLAP < 0
+        or config.CHUNK_OVERLAP >= config.CHUNK_SIZE
+    ):
+        raise ValueError(
+            "CHUNK_OVERLAP must be non-negative and smaller than CHUNK_SIZE."
+        )
+
+    if config.TOP_K <= 0:
+        raise ValueError("TOP_K must be greater than 0.")
+
+    return config
+
 
 
 settings = get_settings()
