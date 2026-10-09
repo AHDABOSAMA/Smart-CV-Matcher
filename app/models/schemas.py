@@ -21,12 +21,14 @@ class CVUploadResponse(BaseModel):
 class QueryRequest(BaseModel):
     question: str = Field(
         ...,
-        example="Is this candidate suitable for a Data Analyst role?",
+        json_schema_extra={
+            "example": "Is this candidate suitable for a Data Analyst role?"
+        },
         description="Natural-language question about the CVs (English or Arabic).",
     )
     cv_filename: Optional[str] = Field(
         None,
-        example="john_doe.pdf",
+        json_schema_extra={"example": "john_doe.pdf"},
         description="Filter retrieval to a specific CV. Leave empty to search all CVs.",
     )
     top_k: Optional[int] = Field(
