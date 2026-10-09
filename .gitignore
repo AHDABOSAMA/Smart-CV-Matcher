@@ -22,3 +22,6 @@ chroma_db/
 .DS_Store
 Thumbs.db
 venv310/
+
+venv_old/
+manual_llm_check.py
