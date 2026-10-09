@@ -6,6 +6,7 @@ import os
 import shutil
 import logging
 from pathlib import Path
+from uuid import uuid4
 
 from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
 
@@ -31,10 +32,18 @@ async def upload_cv(file: UploadFile = File(...)):
 
     Accepts: .pdf files only
     """
-    if not file.filename.lower().endswith(".pdf"):
+        
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="A filename is required.")
+
+    original_filename = Path(file.filename.replace("\\", "/")).name
+
+    if not original_filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
 
-    save_path = DATA_DIR / file.filename
+    stored_filename = f"{uuid4().hex}_{original_filename}"
+    save_path = DATA_DIR / stored_filename
+
 
     # Save the uploaded PDF to disk
     try:
@@ -67,25 +76,42 @@ async def upload_cv(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Embedding/storage failed: {e}")
 
     return CVUploadResponse(
-        filename=file.filename,
+        filename=stored_filename,
         chunks_added=stored,
         language_detected=lang,
-        message=f"Successfully processed '{file.filename}' into {stored} chunks.",
+        message=f"Successfully processed '{original_filename}' into {stored} chunks.",
     )
+
+
 
 
 @router.delete("/{filename}")
 def delete_cv(filename: str):
     """
-    Remove all chunks for a CV from ChromaDB and delete the file from disk.
+    Remove a CV's chunks from ChromaDB and delete its file from disk.
     """
+    if (
+        Path(filename.replace("\\", "/")).name != filename
+        or "/" in filename
+        or "\\" in filename
+    ):
+        raise HTTPException(status_code=400, detail="Invalid filename.")
+
+    if not filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF filenames are accepted.")
+
     file_path = DATA_DIR / filename
+
+    if not file_path.is_file():
+        raise HTTPException(status_code=404, detail="CV not found.")
+
     delete_by_source(filename)
+    file_path.unlink()
 
-    if file_path.exists():
-        os.remove(file_path)
-
-    return {"message": f"'{filename}' has been deleted.", "remaining_chunks": collection_count()}
+    return {
+        "message": f"'{filename}' has been deleted.",
+        "remaining_chunks": collection_count(),
+    }
 
 
 @router.get("/list")
