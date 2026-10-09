@@ -15,6 +15,11 @@ class Settings:
     # ── API keys (only the active provider needs to be set) ──────────────────
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    CORS_ORIGINS: str = os.getenv(
+    "CORS_ORIGINS",
+    "http://localhost:3000,http://localhost:8001",
+    )
+
 
     # ── Ollama settings ───────────────────────────────────────────────────────
     OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama3")
