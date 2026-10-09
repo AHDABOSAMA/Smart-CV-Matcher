@@ -14,15 +14,18 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Allow all origins for dev; restrict in production
+# Configure allowed CORS origins through the CORS_ORIGINS environment variable.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=[
+        origin.strip()
+        for origin in settings.CORS_ORIGINS.split(",")
+        if origin.strip()
+    ],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # Register route groups
 app.include_router(health_router, tags=["Health"])
 app.include_router(cv_router,    prefix="/cv",    tags=["CV Management"])
@@ -32,7 +35,7 @@ app.include_router(query_router, prefix="/query", tags=["RAG Query"])
 @app.get("/")
 def root():
     return {
-        "message": "Smart CV Matcher API is running 🚀",
+        "message": "Smart CV Matcher API is running.",
         "docs": "/docs",
         "health": "/health",
     }

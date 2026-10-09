@@ -1,4 +1,4 @@
-# Secrets — NEVER commit
+# Secrets - NEVER commit
 .env
 
 # Python
@@ -9,6 +9,7 @@ __pycache__/
 venv/
 venv_old/
 *.egg-info/
+.pytest_cache/
 
 # Data & DB (large files, generated at runtime)
 data/cvs/
