@@ -36,8 +36,9 @@ class QueryRequest(BaseModel):
     )
     llm_provider: Optional[str] = Field(
         None,
-        example="gemini",
-        description="Override the default LLM provider for this request (gemini | openai | ollama).",
+        pattern="^(gemini|openai|ollama)$",
+        examples=["gemini"],
+        description="Override the default LLM provider for this request.",
     )
 
 
