@@ -1,0 +1,50 @@
+"""
+Core configuration — reads from environment variables (or .env via docker-compose).
+All secrets/keys live here; never hardcode them elsewhere.
+"""
+
+import os
+from functools import lru_cache
+
+
+class Settings:
+    # ── LLM provider selection ───────────────────────────────────────────────
+    # Options: "gemini" | "openai" | "ollama"
+    LLM_PROVIDER: str = os.getenv("LLM_PROVIDER", "ollama")
+
+    # ── API keys (only the active provider needs to be set) ──────────────────
+    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+
+    # ── Ollama settings ───────────────────────────────────────────────────────
+    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "llama3")
+
+    OLLAMA_BASE_URL: str = os.getenv(
+        "OLLAMA_BASE_URL",
+        "http://localhost:11434"
+    )
+
+    # ── Embedding model (free, multilingual: Arabic + English) ───────────────
+    EMBEDDING_MODEL: str = os.getenv(
+        "EMBEDDING_MODEL",
+        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    )
+
+    # ── ChromaDB ──────────────────────────────────────────────────────────────
+    CHROMA_PERSIST_DIR: str = os.getenv("CHROMA_PERSIST_DIR", "./chroma_db")
+    CHROMA_COLLECTION: str = os.getenv("CHROMA_COLLECTION", "cv_chunks")
+
+    # ── Chunking strategy ─────────────────────────────────────────────────────
+    CHUNK_SIZE: int = int(os.getenv("CHUNK_SIZE", "400"))
+    CHUNK_OVERLAP: int = int(os.getenv("CHUNK_OVERLAP", "50"))
+
+    # ── Retrieval ─────────────────────────────────────────────────────────────
+    TOP_K: int = int(os.getenv("TOP_K", "5"))
+
+
+@lru_cache()
+def get_settings() -> Settings:
+    return Settings()
+
+
+settings = get_settings()
